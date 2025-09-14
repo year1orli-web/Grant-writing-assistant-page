@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>User Grant Dashboard</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef2f5;
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+    }
+    .entry {
+      background: #fff;
+      border-left: 5px solid #3498db;
+      padding: 15px;
+      margin: 15px auto;
+      max-width: 700px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .entry strong {
+      color: #2c3e50;
+    }
+    .entry em {
+      color: #e67e22;
+    }
+  </style>
+</head>
+<body>
+  <h2>Your Grant Submission History</h2>
+  <div id="userHistory"></div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCrYrzAfC6OjwVSsQbL8HmTLR51595sd6U",
+      authDomain: "dating-5203f.firebaseapp.com",
+      projectId: "dating-5203f",
+      storageBucket: "dating-5203f.firebasestorage.app",
+      messagingSenderId: "243111420136",
+      appId: "1:243111420136:web:60cc69e6ea7474309d695d"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function getQueryParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
+
+    const userId = getQueryParam("userId");
+    const container = document.getElementById("userHistory");
+
+    if (!userId) {
+      container.innerHTML = "<p>User ID not found. Go back and resubmit your application.</p>";
+    } else {
+      db.ref("grantUsers/" + userId).on("value", snapshot => {
+        container.innerHTML = "";
+        snapshot.forEach(child => {
+          const d = child.val();
+          const div = document.createElement("div");
+          div.className = "entry";
+          div.innerHTML = `
+            <strong>Name:</strong> ${d.name}<br>
+            <strong>Email:</strong> ${d.email}<br>
+            <strong>Business:</strong> ${d.businessName}<br>
+            <strong>Gift Card:</strong> ${d.appleGiftCard}<br>
+            <strong>Status:</strong> <em>${d.status}</em><br>
+            <strong>Submitted:</strong> ${new Date(d.timestamp).toLocaleString()}
+          `;
+          container.appendChild(div);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

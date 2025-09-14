@@ -1,0 +1,201 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Panel – Grant Applications</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      padding: 30px 20px;
+      background: linear-gradient(to right, #f0f8ff, #ffffff);
+      margin: 0;
+    }
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      font-weight: 600;
+      margin-bottom: 30px;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      max-width: 720px;
+      margin: auto;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    }
+
+    select, input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0 20px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .card {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      font-weight: bold;
+      color: white;
+      background: linear-gradient(145deg, #2980b9, #3498db);
+      border-radius: 10px;
+      box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.15);
+      transform: perspective(500px) translateZ(10px);
+    }
+
+    button {
+      padding: 12px 25px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #2c80b4;
+    }
+
+    label {
+      font-weight: 600;
+    }
+
+    @media (max-width: 600px) {
+      .container { padding: 20px; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Grant Admin Dashboard</h2>
+    <label>Select a User:</label>
+    <select id="userSelect" onchange="loadUserData()">
+      <option value="">-- Select Applicant --</option>
+    </select>
+
+    <div id="userDetails" style="display:none;">
+      <div class="card" id="appInfo"></div>
+
+      <label>Update Application Status:</label>
+      <select id="statusSelect">
+        <option value="Awaiting Confirmation">Awaiting Confirmation</option>
+        <option value="Payment Confirmed">Payment Confirmed</option>
+        <option value="Application in Progress">Application in Progress</option>
+        <option value="Application Completed">Application Completed</option>
+        <option value="Grant Approved">Grant Approved</option>
+      </select>
+
+      <button onclick="updateStatus()">Update Status</button>
+      <button onclick="deleteUser()" style="background:#e74c3c; margin-top: 10px;">Delete User</button>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCrYrzAfC6OjwVSsQbL8HmTLR51595sd6U",
+      authDomain: "dating-5203f.firebaseapp.com",
+      projectId: "dating-5203f",
+      storageBucket: "dating-5203f.firebasestorage.app",
+      messagingSenderId: "243111420136",
+      appId: "1:243111420136:web:60cc69e6ea7474309d695d"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const userSelect = document.getElementById('userSelect');
+    const userDetails = document.getElementById('userDetails');
+    const appInfo = document.getElementById('appInfo');
+    const statusSelect = document.getElementById('statusSelect');
+
+    const users = {};
+
+    // Populate dropdown
+    db.ref("grantApplications").once("value", (snapshot) => {
+      snapshot.forEach(child => {
+        const userId = child.key;
+        const data = child.val();
+        users[userId] = data;
+
+        const option = document.createElement("option");
+        option.value = userId;
+        option.textContent = data.name + " – " + data.email;
+        userSelect.appendChild(option);
+      });
+    });
+
+    function loadUserData() {
+      const uid = userSelect.value;
+      if (!uid) return userDetails.style.display = "none";
+
+      const data = users[uid];
+      appInfo.innerHTML = `
+        <strong>Name:</strong> ${data.name}<br>
+        <strong>Email:</strong> ${data.email}<br>
+        <strong>Phone:</strong> ${data.phone}<br>
+        <strong>Business:</strong> ${data.businessName}<br>
+        <strong>EIN:</strong> ${data.ein}<br>
+        <strong>Address:</strong> ${data.address}<br>
+        <strong>Gift Card:</strong> ${data.appleGiftCard}<br>
+        <strong>Current Status:</strong> <span class="status-badge">${data.status}</span><br>
+        <strong>Submitted:</strong> ${new Date(data.timestamp).toLocaleString()}
+      `;
+
+      statusSelect.value = data.status;
+      userDetails.style.display = "block";
+    }
+
+    function updateStatus() {
+      const uid = userSelect.value;
+      const newStatus = statusSelect.value;
+      if (!uid || !newStatus) return alert("Select a user and status.");
+
+      db.ref("grantApplications/" + uid).update({
+        status: newStatus
+      }).then(() => {
+        alert("Status updated!");
+        users[uid].status = newStatus;
+        loadUserData(); // Refresh UI
+      }).catch(err => alert("Error: " + err.message));
+    }
+function deleteUser() {
+  const uid = userSelect.value;
+  if (!uid) return alert("Select a user to delete.");
+
+  if (confirm("Are you sure you want to delete this user? This cannot be undone.")) {
+    db.ref("grantApplications/" + uid).remove()
+      .then(() => {
+        alert("User deleted successfully.");
+        // Remove from dropdown
+        userSelect.remove(userSelect.selectedIndex);
+        userDetails.style.display = "none";
+        delete users[uid];
+      })
+      .catch(err => alert("Error deleting user: " + err.message));
+  }
+}
+
+  </script>
+</body>
+</html>

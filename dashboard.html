@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Grant Status</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <!-- Fonts and Styles -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #f0f8ff, #ffffff);
+      padding: 40px 20px;
+      margin: 0;
+    }
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      font-weight: 600;
+      margin-bottom: 30px;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      margin: auto;
+      max-width: 650px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+      border-left: 6px solid #3498db;
+      border-radius: 12px;
+    }
+    .card p {
+      font-size: 1.1rem;
+      margin: 10px 0;
+    }
+    .status-box {
+      display: inline-block;
+      padding: 10px 20px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: white;
+      background: linear-gradient(145deg, #2980b9, #3498db);
+      border-radius: 10px;
+    }
+    .progress-container {
+      margin-top: 20px;
+    }
+    .progress-bar-bg {
+      background: #e0e0e0;
+      height: 30px;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background-color: #4caf50;
+      color: white;
+      text-align: center;
+      line-height: 30px;
+      width: 0;
+      transition: 0.3s;
+    }
+    .referral-text {
+      margin-top: 10px;
+      font-weight: bold;
+      text-align: center;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button.copy-btn {
+      padding: 8px 16px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .reward-3d {
+      margin-top: 30px;
+      font-size: 28px;
+      font-weight: 700;
+      text-align: center;
+      perspective: 800px;
+      color: #2c3e50;
+      transform: rotateX(15deg);
+      text-shadow:
+        1px 1px 0 #ccc,
+        2px 2px 0 #bbb,
+        3px 3px 0 #aaa,
+        4px 4px 0 #999;
+      animation: bounceIn 1s ease-out;
+    }
+
+    .reward-3d span {
+      display: block;
+      font-size: 36px;
+      color: #27ae60;
+      text-shadow:
+        1px 1px 0 #ccc,
+        2px 2px 0 #bbb,
+        3px 3px 0 #aaa,
+        4px 4px 0 #999;
+    }
+
+    @keyframes bounceIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.3) rotateX(90deg);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.05) rotateX(-10deg);
+      }
+      70% {
+        transform: scale(0.95) rotateX(10deg);
+      }
+      100% {
+        transform: scale(1) rotateX(0deg);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .card { padding: 20px; }
+      .status-box { font-size: 1rem; padding: 8px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <h2>Your Grant Application Status</h2>
+  <div id="statusCard"></div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCrYrzAfC6OjwVSsQbL8HmTLR51595sd6U",
+      authDomain: "dating-5203f.firebaseapp.com",
+      projectId: "dating-5203f",
+      storageBucket: "dating-5203f.appspot.com",
+      messagingSenderId: "243111420136",
+      appId: "1:243111420136:web:60cc69e6ea7474309d695d"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+    const fs = firebase.firestore();
+
+    const referralGoal = 10;
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        alert("Please log in first");
+        window.location.href = "index.html";
+        return;
+      }
+
+      const uid = user.uid;
+
+      // Display grant application
+      const snapshot = await db.ref('grantApplications/' + uid).once('value');
+      const d = snapshot.val();
+
+      const cardHTML = `
+        <div class="card">
+          <p><strong>Name:</strong> ${d.name}</p>
+          <p><strong>Email:</strong> ${d.email}</p>
+          <p><strong>Business:</strong> ${d.businessName}</p>
+          <p><strong>Status:</strong> <span class="status-box">${d.status}</span></p>
+          <p><strong>Submitted:</strong> ${new Date(d.timestamp).toLocaleString()}</p>
+
+          <div class="progress-container">
+            <div class="progress-bar-bg">
+              <div id="referralProgress" class="progress-bar">0%</div>
+            </div>
+            <div class="referral-text" id="referralCountText">Loading referrals...</div>
+          </div>
+
+          <div style="margin-top: 25px;">
+            <p><strong>Your Referral Link:</strong></p>
+            <input id="referralLink" type="text" readonly />
+            <button class="copy-btn" onclick="copyReferralLink()">Copy</button>
+          </div>
+
+          <p class="referral-text">Share your referral link with friends and family to gain access to exclusive services, including credit score optimization and eligibility for additional grants and loans!</p>
+        </div>
+      `;
+      document.getElementById("statusCard").innerHTML = cardHTML;
+      document.getElementById("referralLink").value = `${window.location.origin}${window.location.pathname}?ref=${uid}`;
+
+      // Check if user record exists in Firestore
+      const userRef = fs.collection("users").doc(uid);
+      const userDoc = await userRef.get();
+      if (!userDoc.exists) {
+        await userRef.set({ referrals: [] });
+      }
+
+      // Process referral if user visited via link
+      const urlParams = new URLSearchParams(window.location.search);
+      const ref = urlParams.get("ref");
+      if (ref && ref !== uid) {
+        const visitKey = `ref-visit-${ref}`;
+        if (!localStorage.getItem(visitKey)) {
+          localStorage.setItem(visitKey, "true");
+          const refDoc = fs.collection("users").doc(ref);
+          const refSnap = await refDoc.get();
+          if (refSnap.exists) {
+            const referrals = new Set(refSnap.data().referrals || []);
+            referrals.add(uid);
+            await refDoc.update({ referrals: Array.from(referrals) });
+          }
+        }
+      }
+
+      // Update referral progress
+      updateReferralProgress(uid);
+    });
+
+    async function updateReferralProgress(uid) {
+      const doc = await firebase.firestore().collection("users").doc(uid).get();
+      const referrals = doc.data()?.referrals || [];
+      const count = referrals.length;
+      const percent = Math.min(100, (count / referralGoal) * 100);
+
+      document.getElementById("referralCountText").textContent = `${count} / ${referralGoal} referrals`;
+      const progress = document.getElementById("referralProgress");
+      progress.style.width = percent + "%";
+      progress.textContent = Math.floor(percent) + "%";
+
+      // Show reward if achieved
+      const existing = document.getElementById("reward3d");
+      if (count >= referralGoal && !existing) {
+        const rewardDiv = document.createElement("div");
+        rewardDiv.id = "reward3d";
+        rewardDiv.innerHTML = `
+          <div class="reward-3d">Rephrase:<br><span>Your Guarantee!</span></div>
+        `;
+        document.querySelector(".card").appendChild(rewardDiv);
+      } else if (count < referralGoal && existing) {
+        existing.remove();
+      }
+    }
+
+    function copyReferralLink() {
+      const input = document.getElementById("referralLink");
+      input.select();
+      input.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      alert("Referral link copied!");
+    }
+  </script>
+</body>
+</html>
