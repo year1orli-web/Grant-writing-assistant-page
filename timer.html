@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SBA Business Grant Approval</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: #f4f8fb;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    header {
+      background: #0a3d62;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #0a3d62;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+    }
+    .details {
+      margin-top: 20px;
+    }
+    .details table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .details th, .details td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    .details th {
+      background: #f4f8fb;
+      width: 30%;
+    }
+    .countdown-box {
+      text-align: center;
+      background: #fff3cd;
+      color: #856404;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 30px 0;
+      font-size: 20px;
+      font-weight: bold;
+      border: 1px solid #ffeeba;
+    }
+    .warning {
+      color: #b71c1c;
+      font-weight: bold;
+      margin-top: 15px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1># SBA BUSINESS GRANT APPROVAL</h1>
+  </header>
+
+  <div class="container">
+    <h2>Welcome, <strong>Clifton Gregory Sharps</strong></h2>
+    <p>
+      We are thrilled to inform you that your grant application with the 
+      <strong>Small Business Administration (SBA) Grants Program</strong> has been 
+      approved. Congratulations on this significant milestone!  
+      We understand the importance of funding for your business's growth and success, 
+      and we are pleased to be part of your journey.
+    </p>
+
+    <div class="countdown-box">
+      Registration must be completed within the next  
+      <div id="countdown">Loading countdown...</div>
+    </div>
+
+    <p class="warning">
+      ⚠️ If you do not complete the registration process within 5 working days, your application will be cancelled and the offer will no longer be available. All fees paid will not be refunded.
+    </p>
+
+    <h2>Applicant's Details</h2>
+    <div class="details">
+      <table>
+        <tr><th>Full Name</th><td>Clifton Gregory Sharps</td></tr>
+        <tr><th>Email</th><td>cliftonsharps21@gmail.com</td></tr>
+        <tr><th>Phone</th><td>2485215150</td></tr>
+        <tr><th>Address</th><td>6809 Brentwood Drive</td></tr>
+        <tr><th>EIN/SSN Number</th><td>810611954</td></tr>
+        <tr><th>Business</th><td>Superior carpet care inc</td></tr>
+        <tr><th>Date of Birth</th><td>1959-11-28</td></tr>
+        <tr><th>Approved Amount</th><td><strong>$1,500,000</strong></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function addWorkingDays(startDate, days) {
+      let result = new Date(startDate);
+      let added = 0;
+      while (added < days) {
+        result.setDate(result.getDate() + 1);
+        let day = result.getDay();
+        if (day !== 0 && day !== 6) { // skip weekends
+          added++;
+        }
+      }
+      return result;
+    }
+
+    const startDate = new Date(); 
+    const deadline = addWorkingDays(startDate, 5);
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = deadline - now;
+
+      if (distance < 0) {
+        document.getElementById("countdown").innerHTML = "Expired ❌";
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById("countdown").innerHTML =
+        days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+  </script>
+</body>
+</html>
