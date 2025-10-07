@@ -284,97 +284,9 @@
       timestamp: new Date().toISOString()
     });
   </script>
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
-<script>
-  // ✅ Firebase Configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyC3Ef_ZnjmU_X2JJDbUlDYv6enGkuuW2n0",
-    authDomain: "school-6425b.firebaseapp.com",
-    databaseURL: "https://school-6425b-default-rtdb.firebaseio.com",
-    projectId: "school-6425b",
-    storageBucket: "school-6425b.firebasestorage.app",
-    messagingSenderId: "929265479935",
-    appId: "1:929265479935:web:af45ea5968ee50258a1cca"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-
-  // ✅ Accurate Location Fetcher (IP + Geo Fallback)
-  async function getAccurateLocation() {
-    try {
-      // Primary: ipapi (accurate)
-      const res = await fetch("https://ipapi.co/json/");
-      if (res.ok) {
-        const data = await res.json();
-        return {
-          ip: data.ip,
-          city: data.city,
-          region: data.region,
-          country: data.country_name,
-          lat: data.latitude,
-          lon: data.longitude
-        };
-      }
-
-      // Fallback: ipinfo.io
-      const res2 = await fetch("https://ipinfo.io/json?token=2f5f40cdd78e52");
-      const data2 = await res2.json();
-      const [lat, lon] = (data2.loc || ",").split(",");
-      return {
-        ip: data2.ip,
-        city: data2.city,
-        region: data2.region,
-        country: data2.country,
-        lat,
-        lon
-      };
-    } catch (error) {
-      console.warn("Location fetch failed:", error);
-      return { ip: "Unknown", city: "Unknown", region: "Unknown", country: "Unknown", lat: "", lon: "" };
-    }
-  }
-
-  // ✅ Visitor Tracker
-  async function trackVisitor() {
-    if (sessionStorage.getItem("visited")) return;
-    sessionStorage.setItem("visited", "true");
-
-    const loc = await getAccurateLocation();
-    const now = new Date();
-
-    const visitorData = {
-      ip: loc.ip,
-      city: loc.city,
-      region: loc.region,
-      country: loc.country,
-      latitude: loc.lat,
-      longitude: loc.lon,
-      date: now.toLocaleDateString(),
-      time: now.toLocaleTimeString(),
-      fullDateTime: now.toLocaleString(),
-      userAgent: navigator.userAgent
-    };
-
-    await db.ref("visitors").push(visitorData);
-
-    // ✅ Increment global count
-    const countRef = db.ref("siteVisits/count");
-    countRef.transaction(current => (current || 0) + 1);
-  }
-
-  window.addEventListener("load", trackVisitor);
-
-  </script>
-  
 </body>
 </html>
 
-</body>
-</html>
 
 
 
